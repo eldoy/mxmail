@@ -1,0 +1,24 @@
+{
+  "name": "mxmail",
+  "version": "0.1.0",
+  "description": "Send mail directly to mail exchange servers, just like sendmail",
+  "bin": {
+    "mx": "bin/mxmail.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eldoy/mxmail"
+  },
+  "author": "Vidar Eldøy <vidar@eldoy.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^26.6.3"
+  },
+  "dependencies": {
+    "nodemailer": "^6.5.0"
+  }
+}
