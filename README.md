@@ -1,6 +1,6 @@
 # Mxmail
 
-Send mail directly to mail exchange servers. Based on [nodemailer.](https://github.com/nodemailer/nodemailer)
+Send mail directly to mail exchange servers or SMTP. Based on [nodemailer.](https://github.com/nodemailer/nodemailer)
 
 ### Installation
 
@@ -22,7 +22,7 @@ const mail = {
   html: '<b>Are you ready?</b>'
 }
 
-// Will lookup mx records for each email in 'to' and send
+// Will lookup mx records automatically for each email in 'to'
 mxmail(mail)
 
 // Config is optional
@@ -62,7 +62,6 @@ Add a settings file in ~/.mxmail.json:
   }
 }
 ```
-
 
 Send email like this from the command line (terminal):
 ```
