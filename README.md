@@ -1,4 +1,4 @@
-# MXMail
+# Mxmail
 
 Send mail directly to mail exchange servers. Based on [nodemailer.](https://github.com/nodemailer/nodemailer)
 
