@@ -61,10 +61,11 @@ module.exports = async function(mail = {}, config) {
       if (preview) {
         console.log('Preview URL: %s', preview)
       }
-
+      return result
     } catch (e) {
       console.error(`Sending to host ${host} failed, skipping...`)
       console.error(e.message)
+      return { error: { message: e.message } }
     }
   }
 }
