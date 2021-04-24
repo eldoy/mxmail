@@ -20,5 +20,5 @@ const attachments = process.argv.slice(5).map(function(file) {
   const filename = path.basename(file)
   return { filename, path: file }
 })
-
-mxmail({ to, from, subject, text, html, attachments }, config)
+const mailer = mxmail(config)
+mailer({ to, from, subject, text, html, attachments })

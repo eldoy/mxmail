@@ -13,19 +13,6 @@ npm i mxmail
 ```js
 const mxmail = require('mxmail')
 
-// Takes two parameters: mail, config
-const mail = {
-  from: '"Fred Foo 👻" <foo@example.com>',
-  to: 'bar@example.com, baz@example.com',
-  subject: 'Hello ✔',
-  text: 'Are you ready?',
-  html: '<b>Are you ready?</b>'
-}
-
-// Will lookup mx records automatically for each email in 'to'
-mxmail(mail)
-
-// Config is optional
 // If config is defined, mx lookup is skipped
 const config = {
   host: 'smtp.ethereal.email',
@@ -35,7 +22,19 @@ const config = {
     pass: '1md9Xes49Nbfka6aFw'
   }
 }
-mxmail(mail, config)
+const mailer = mxmail(config)
+
+// Set up mail
+const mail = {
+  from: '"Fred Foo 👻" <foo@example.com>',
+  to: 'bar@example.com, baz@example.com',
+  subject: 'Hello ✔',
+  text: 'Are you ready?',
+  html: '<b>Are you ready?</b>'
+}
+
+// Will lookup mx records automatically for each email in 'to'
+const result = await mailer(mail)
 ```
 
 ### Command line
