@@ -42,7 +42,7 @@ module.exports = async function(mail = {}, config) {
   for (const host of hosts) {
     try {
       // Find config
-      if (!config) {
+      if (!config || !Object.keys(config).length) {
         config = getConfig(await getRecords(host))
       }
 
