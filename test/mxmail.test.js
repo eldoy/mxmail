@@ -25,6 +25,12 @@ it('should send email', async () => {
 })
 
 it('should generate a message ID', async () => {
-  const id = mailer.id()
+  let id = mailer.id()
   expect(typeof id).toBe('string')
+
+  id = mailer.id('vidar@test.com')
+  expect(id.endsWith('test.com>')).toBe(true)
+
+  id = mailer.id('Vidar <vidar@test.com>')
+  expect(id.endsWith('test.com>')).toBe(true)
 })

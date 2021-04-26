@@ -80,7 +80,7 @@ module.exports = function(config = {}) {
       (prev, len) => prev + '-' + crypto.randomBytes(len).toString('hex'),
       crypto.randomBytes(4).toString('hex')
     )
-    const host = (from || os.hostname() || 'localhost').split('@').pop()
+    const host = (getHost(from) || os.hostname() || 'localhost').split('@').pop()
     return `<${random}@${host}>`
   }
 
