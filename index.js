@@ -40,12 +40,17 @@ module.exports = function(config = {}) {
     // Defaults
     mail = { text: '', html: '', subject: '', ...mail }
 
+    console.log('Sending mail', JSON.stringify(mail, null, 2))
+
     // Hosts to send to
     const hosts = mail.to.split(',').map(getHost)
+    console.log('Found hosts', hosts)
 
     for (const host of hosts) {
       // Find records
       const records = await getRecords(host)
+
+      console.log('Found records', records)
 
       if (!records.length) {
         throw Error(`no mx records found`)
@@ -55,6 +60,8 @@ module.exports = function(config = {}) {
       if (!Object.keys(config).length) {
         config = getConfig(records)
       }
+
+      console.log('Found config', config)
 
       if (!config) {
         throw Error(`config not available for host ${host}`)
