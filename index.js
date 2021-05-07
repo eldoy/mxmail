@@ -44,20 +44,27 @@ module.exports = function(config = {}) {
     const hosts = mail.to.split(',').map(getHost)
 
     for (const host of hosts) {
+      // Find records
+      const records = await getRecords(host)
+
+      if (!records.length) {
+        throw Error(`no mx records found`)
+      }
+
+      // Find config
+      if (!Object.keys(config).length) {
+        config = getConfig(records)
+      }
+
+      if (!config) {
+        throw Error(`config not available for host ${host}`)
+      }
+
+      // Create transport and verify
+      const transport = nodemailer.createTransport(config)
+      await transport.verify()
+
       try {
-        // Find config
-        if (!Object.keys(config).length) {
-          config = getConfig(await getRecords(host))
-        }
-
-        if (!config) {
-          throw Error(`config not available for host ${host}`)
-        }
-
-        // Create transport
-        const transport = nodemailer.createTransport(config)
-        await transport.verify()
-
         // Send mail
         const result = await transport.sendMail(mail)
         console.log('Message sent: %s', result.messageId)
@@ -69,6 +76,7 @@ module.exports = function(config = {}) {
       } catch (e) {
         console.error(`Sending to host ${host} failed, skipping...`)
         console.error(e.message)
+        console.error(JSON.stringify(mail, null, 2))
         return { error: { message: e.message } }
       }
     }
