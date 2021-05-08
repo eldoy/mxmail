@@ -56,7 +56,7 @@ module.exports = function(config = {}) {
 
       // Find host if it's missing
       if (!config.host) {
-        config.port = 25
+        config.port = config.port || 25
         for (let i = 0; i < records.length; i++) {
           const record = records[i]
           config.host = record.exchange
