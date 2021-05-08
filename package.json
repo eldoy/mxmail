@@ -1,6 +1,6 @@
 {
   "name": "mxmail",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Send mail directly to mail exchange servers, just like sendmail",
   "bin": {
     "mx": "bin/mxmail.js"
