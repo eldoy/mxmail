@@ -12,18 +12,10 @@ function getRecords(host) {
   return new Promise((resolve, reject) => {
     dns.resolveMx(host, function(err, records) {
       if (err) reject(err)
-      records.sort((a, b) => a.priority - b.priority)
+      records.filter(r => r.exchange).sort((a, b) => a.priority - b.priority)
       resolve(records)
     })
   })
-}
-
-function getConfig(records) {
-  for (const record of records) {
-    if (record.exchange) {
-      return { host: record.exchange, port: 25 }
-    }
-  }
 }
 
 module.exports = function(config = {}) {
@@ -49,27 +41,42 @@ module.exports = function(config = {}) {
     for (const host of hosts) {
       // Find records
       const records = await getRecords(host)
-
       console.log('Found records', records)
-
       if (!records.length) {
-        throw Error(`no mx records found`)
+        throw Error(`no mx records found for ${host}`)
       }
 
-      // Find config
-      if (!Object.keys(config).length) {
-        config = getConfig(records)
+      let transport
+
+      // Find host if it's missing
+      if (!config.host) {
+        config.port = 25
+        for (let i = 0; i < records.length; i++) {
+          const record = records[i]
+          config.host = record.exchange
+          try {
+            transport = nodemailer.createTransport(config)
+            await transport.verify()
+            break
+          } catch (e) {
+            // Verify failed, try next record
+            if (!records[i+1]) {
+              throw e
+            }
+          }
+        }
       }
 
       console.log('Found config', config)
 
-      if (!config) {
+      if (!config.host) {
         throw Error(`config not available for host ${host}`)
       }
 
-      // Create transport and verify
-      const transport = nodemailer.createTransport(config)
-      await transport.verify()
+      if (!transport) {
+        transport = nodemailer.createTransport(config)
+        await transport.verify()
+      }
 
       try {
         // Send mail
@@ -81,10 +88,10 @@ module.exports = function(config = {}) {
         }
         return result
       } catch (e) {
-        console.error(`Sending to host ${host} failed, skipping...`)
-        console.error(e.message)
-        console.error(JSON.stringify(mail, null, 2))
-        return { error: { message: e.message } }
+        console.log(`Sending to host ${host} failed, skipping...`)
+        console.log(e.message)
+        console.log(JSON.stringify(mail, null, 2))
+        throw e
       }
     }
   }
