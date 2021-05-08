@@ -38,9 +38,15 @@ module.exports = function(config = {}) {
     const hosts = mail.to.split(',').map(getHost)
     console.log('Found hosts', hosts)
 
+    const recordCache = {}
+
     for (const host of hosts) {
-      // Find records
-      const records = await getRecords(host)
+      // Find records, cache in case hosts are the same
+      let records = recordCache[host]
+      if (!records) {
+        records = await getRecords(host)
+        recordCache[host] = records
+      }
       console.log('Found records', records)
       if (!records.length) {
         throw Error(`no mx records found for ${host}`)
