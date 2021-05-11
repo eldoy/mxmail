@@ -2,7 +2,7 @@ const mxmail = require('../index.js')
 
 const mail = {
   from: '"Fred Foo 👻" <foo@example.com>',
-  to: 'bar@example.com, baz@example.com',
+  to: 'bar@ethereal.email, baz@ethereal.email',
   subject: 'Hello ✔',
   text: 'Are you ready?',
   html: '<b>Are you ready?</b>'

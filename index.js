@@ -12,7 +12,7 @@ function getRecords(host) {
   return new Promise((resolve, reject) => {
     dns.resolveMx(host, function(err, records) {
       if (err) reject(err)
-      records.filter(r => r.exchange).sort((a, b) => a.priority - b.priority)
+      records = records.filter(r => r.exchange).sort((a, b) => a.priority - b.priority)
       resolve(records)
     })
   })
