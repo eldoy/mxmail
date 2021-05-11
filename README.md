@@ -72,4 +72,15 @@ Replace with aliases like this:
 mx @sp subject "This is the message"
 ```
 
+Send file attachments like this:
+```
+mx @ve "File" "Check this" ~/file.jpg
+```
+
+Using zsh alias:
+```
+alias file='mx @ve "" ""'
+file ~/file.jpg
+```
+
 MIT Licensed. Enjoy!
