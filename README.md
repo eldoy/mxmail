@@ -39,7 +39,12 @@ const result = await mailer(mail)
 
 If you need a valid message ID, there is a generator function included:
 ```js
+// Using the hostname of your computer
 const id = mxmail.id()
+
+// Using the domain you pass
+const id = mxmail.id('example.com')
+
 // Will return similar to:
 // <223d0b02-e987-2647-e30c-b71070a587ce@example.com>
 ```
