@@ -3,7 +3,7 @@ const crypto = require('crypto')
 const dns = require('dns')
 const nodemailer = require('nodemailer')
 
-function getHost(email) {
+function getDomain(email) {
   const m = /[^@]+@([\w\d\-\.]+)/.exec(email)
   return m && m[1]
 }
@@ -35,22 +35,22 @@ module.exports = function(config = {}) {
 
     console.log('Sending mail', JSON.stringify(mail, null, 2))
 
-    // Hosts to send to
-    const hosts = mail.to.split(',').map(getHost)
-    console.log('Found hosts', hosts)
+    // Domains to send to
+    const domains = mail.to.split(',').map(getDomain)
+    console.log('Found domains', domains)
 
     const recordCache = {}
 
-    for (const host of hosts) {
-      // Find records, cache in case hosts are the same
-      let records = recordCache[host]
+    for (const domain of domains) {
+      // Find records, cache in case domains are the same
+      let records = recordCache[domain]
       if (!records) {
-        records = await getRecords(host)
-        recordCache[host] = records
+        records = await getRecords(domain)
+        recordCache[domain] = records
       }
       console.log('Found records', records)
       if (!records.length) {
-        throw Error(`no mx records found for ${host}`)
+        throw Error(`no mx records found for ${domain}`)
       }
 
       let transport
@@ -76,7 +76,7 @@ module.exports = function(config = {}) {
       console.log('Found config', config)
 
       if (!config.host) {
-        throw Error(`config not available for host ${host}`)
+        throw Error(`config not available for domain ${domain}`)
       }
 
       if (!transport) {
@@ -94,7 +94,7 @@ module.exports = function(config = {}) {
         }
         return result
       } catch (e) {
-        console.log(`Sending to host ${host} failed, skipping...`)
+        console.log(`Sending to domain ${domain} failed, skipping...`)
         console.log(e.message)
         console.log(JSON.stringify(mail, null, 2))
         throw e
@@ -108,8 +108,8 @@ module.exports = function(config = {}) {
       (prev, len) => prev + '-' + crypto.randomBytes(len).toString('hex'),
       crypto.randomBytes(4).toString('hex')
     )
-    const host = (getHost(from) || os.hostname() || 'localhost').split('@').pop()
-    return `<${random}@${host}>`
+    const domain = (getDomain(from) || os.hostname() || 'localhost').split('@').pop()
+    return `<${random}@${domain}>`
   }
 
   return mailer
