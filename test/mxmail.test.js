@@ -51,12 +51,12 @@ it('should send email with CC and BCC', async () => {
 })
 
 it('should generate a message ID', async () => {
-  let id = mailer.id()
+  let id = mxmail.id()
   expect(typeof id).toBe('string')
 
-  id = mailer.id('vidar@test.com')
+  id = mxmail.id('vidar@test.com')
   expect(id.endsWith('test.com>')).toBe(true)
 
-  id = mailer.id('Vidar <vidar@test.com>')
+  id = mxmail.id('Vidar <vidar@test.com>')
   expect(id.endsWith('test.com>')).toBe(true)
 })

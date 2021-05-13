@@ -34,7 +34,7 @@ async function getHost(domain) {
   }
 }
 
-module.exports = function(config = {}) {
+function mxmail(config = {}) {
   async function mailer(mail = {}) {
     if (!mail.to) {
       throw Error('to field is missing')
@@ -84,16 +84,17 @@ module.exports = function(config = {}) {
     }
     return { delivered, failed }
   }
-
-  // Based on nodemailer
-  mailer.id = function(from) {
-    const random = [2, 2, 2, 6].reduce(
-      (prev, len) => prev + '-' + crypto.randomBytes(len).toString('hex'),
-      crypto.randomBytes(4).toString('hex')
-    )
-    const domain = (getDomain(from) || os.hostname() || 'localhost').split('@').pop()
-    return `<${random}@${domain}>`
-  }
-
   return mailer
 }
+
+// Based on nodemailer, generates a mail id
+mxmail.id = function(from) {
+  const random = [2, 2, 2, 6].reduce(
+    (prev, len) => prev + '-' + crypto.randomBytes(len).toString('hex'),
+    crypto.randomBytes(4).toString('hex')
+  )
+  const domain = (getDomain(from) || os.hostname() || 'localhost').split('@').pop()
+  return `<${random}@${domain}>`
+}
+
+module.exports = mxmail
