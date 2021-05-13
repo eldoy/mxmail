@@ -53,14 +53,15 @@ module.exports = function(config = {}) {
     const domains = mail.to.split(',').map(getDomain)
     console.log('Found domains', domains)
 
+    const hostCache = {}
     const delivered = []
     const failed = []
 
     for (const domain of domains) {
-      let { host, port = 25, auth } = config
+      let { host = hostCache[domain], port = 25, auth } = config
 
       if (!host) {
-        host = await getHost(domain)
+        host = hostCache[domain] = await getHost(domain)
       }
 
       try {
