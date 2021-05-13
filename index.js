@@ -8,9 +8,9 @@ function getDomain(email) {
   return m && m[1]
 }
 
-function getRecords(host) {
+function getRecords(domain) {
   return new Promise((resolve, reject) => {
-    dns.resolveMx(host, function(err, records) {
+    dns.resolveMx(domain, function(err, records) {
       if (err) reject(err)
       records = records.filter(r => r.exchange).sort((a, b) => a.priority - b.priority)
       resolve(records)
