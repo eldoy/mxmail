@@ -22,8 +22,7 @@ async function getHost(domain) {
   const records = await getRecords(domain)
 
   // Return the first record that verifies
-  for (let i = 0; i < records.length; i++) {
-    const record = records[i]
+  for (const record of records) {
     const transport = nodemailer.createTransport({ host: domain, port: 25 })
     try {
       await transport.verify()
