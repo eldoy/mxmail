@@ -29,6 +29,21 @@ it('should send email', async () => {
   expect(r2.envelope.to).toEqual(['baz@ethereal.email'])
 })
 
+xit('should send email to mx', async () => {
+  const mailer2 = mxmail()
+  const mail2 = {
+    from: 'vidar@o4.no',
+    to: 'vidar@eldoy.com',
+    subject: 'test',
+    text: 'test',
+    html: 'test'
+  }
+  const send = await mailer2(mail2)
+  const r1 = send.delivered[0].result
+  expect(r1.messageId).toBeDefined()
+  expect(r1.envelope.to).toEqual(['vidar@eldoy.com'])
+})
+
 it('should send email with CC and BCC', async () => {
   const mail2 = {
     cc: 'qux@ethereal.email',

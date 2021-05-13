@@ -21,9 +21,11 @@ function getRecords(domain) {
 async function getHost(domain) {
   const records = await getRecords(domain)
 
+  console.log({ records })
+
   // Return the first record that verifies
   for (const record of records) {
-    const transport = nodemailer.createTransport({ host: domain, port: 25 })
+    const transport = nodemailer.createTransport({ host: record.exchange, port: 25 })
     try {
       await transport.verify()
       return record.exchange
@@ -54,6 +56,7 @@ function mxmail(config = {}) {
     for (const recipient of recipients) {
       const domain = getDomain(recipient)
       let { host = hostCache[domain], port = 25, auth } = config
+      console.log({ host })
 
       if (!host) {
         host = hostCache[domain] = await getHost(domain)
@@ -76,7 +79,7 @@ function mxmail(config = {}) {
         }
         delivered.push({ result, mail })
       } catch (e) {
-        console.log(`Sending to domain ${domain} failed!`)
+        console.log(`Sending to recipient ${recipient} failed!`)
         console.log(e.message)
         const error = { name: e.name, message: e.message, stack: e.stack }
         failed.push({ error, mail })
