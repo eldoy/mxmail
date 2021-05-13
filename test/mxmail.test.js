@@ -21,7 +21,33 @@ const mailer = mxmail(config)
 
 it('should send email', async () => {
   const send = await mailer(mail)
-  expect(send.delivered[0].result.messageId).toBeDefined()
+  const r1 = send.delivered[0].result
+  expect(r1.messageId).toBeDefined()
+  expect(r1.envelope.to).toEqual(['bar@ethereal.email'])
+  const r2 = send.delivered[1].result
+  expect(r2.messageId).toBeDefined()
+  expect(r2.envelope.to).toEqual(['baz@ethereal.email'])
+})
+
+it('should send email with CC and BCC', async () => {
+  const mail2 = {
+    cc: 'qux@ethereal.email',
+    bcc: 'quux@ethereal.email',
+    ...mail
+  }
+  const send = await mailer(mail2)
+  const r1 = send.delivered[0].result
+  expect(r1.messageId).toBeDefined()
+  expect(r1.envelope.to).toEqual(['bar@ethereal.email'])
+  const r2 = send.delivered[1].result
+  expect(r2.messageId).toBeDefined()
+  expect(r2.envelope.to).toEqual(['baz@ethereal.email'])
+  const r3 = send.delivered[2].result
+  expect(r3.messageId).toBeDefined()
+  expect(r3.envelope.to).toEqual(['qux@ethereal.email'])
+  const r4 = send.delivered[3].result
+  expect(r4.messageId).toBeDefined()
+  expect(r4.envelope.to).toEqual(['quux@ethereal.email'])
 })
 
 it('should generate a message ID', async () => {
