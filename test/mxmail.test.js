@@ -20,8 +20,8 @@ const config = {
 const mailer = mxmail(config)
 
 it('should send email', async () => {
-  const result = await mailer(mail)
-  expect(result.messageId).toBeDefined()
+  const send = await mailer(mail)
+  expect(send.delivered[0].result.messageId).toBeDefined()
 })
 
 it('should generate a message ID', async () => {

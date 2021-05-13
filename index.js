@@ -18,14 +18,28 @@ function getRecords(domain) {
   })
 }
 
-module.exports = function(config = {}) {
-  config.port = config.port || 25
+async function getHost(domain) {
+  const records = await getRecords(domain)
 
+  // Return the first record that verifies
+  for (let i = 0; i < records.length; i++) {
+    const record = records[i]
+    const transport = nodemailer.createTransport({ host: domain, port: 25 })
+    try {
+      await transport.verify()
+      return record.exchange
+    } catch (e) {
+      console.log(`Could not verify ${record.exchange} (${record.priority})`)
+      console.log(e.message)
+    }
+  }
+}
+
+module.exports = function(config = {}) {
   async function mailer(mail = {}) {
     if (!mail.to) {
       throw Error('to field is missing')
     }
-
     if (!mail.from) {
       throw Error('from field is missing')
     }
@@ -39,67 +53,36 @@ module.exports = function(config = {}) {
     const domains = mail.to.split(',').map(getDomain)
     console.log('Found domains', domains)
 
-    const recordCache = {}
+    const delivered = []
+    const failed = []
 
     for (const domain of domains) {
-      // Find records, cache in case domains are the same
-      let records = recordCache[domain]
-      if (!records) {
-        records = await getRecords(domain)
-        recordCache[domain] = records
-      }
-      console.log('Found records', records)
-      if (!records.length) {
-        throw Error(`no mx records found for ${domain}`)
-      }
+      let { host, port = 25, auth } = config
 
-      let transport
-
-      // Find host if it's missing
-      if (!config.host) {
-        for (let i = 0; i < records.length; i++) {
-          const record = records[i]
-          config.host = record.exchange
-          try {
-            transport = nodemailer.createTransport(config)
-            await transport.verify()
-            break
-          } catch (e) {
-            // Verify failed, try next record
-            if (!records[i+1]) {
-              throw e
-            }
-          }
-        }
-      }
-
-      console.log('Found config', config)
-
-      if (!config.host) {
-        throw Error(`config not available for domain ${domain}`)
-      }
-
-      if (!transport) {
-        transport = nodemailer.createTransport(config)
-        await transport.verify()
+      if (!host) {
+        host = await getHost(domain)
       }
 
       try {
-        // Send mail
+        const transport = nodemailer.createTransport({ host, port, auth })
+
         const result = await transport.sendMail(mail)
         console.log('Message sent: %s', result.messageId)
+
         const preview = nodemailer.getTestMessageUrl(result)
         if (preview) {
           console.log('Preview URL: %s', preview)
         }
-        return result
+        console.log(result)
+        delivered.push({ result, mail })
       } catch (e) {
-        console.log(`Sending to domain ${domain} failed, skipping...`)
+        console.log(`Sending to domain ${domain} failed!`)
         console.log(e.message)
-        console.log(JSON.stringify(mail, null, 2))
-        throw e
+        const error = { name: e.name, message: e.message, stack: e.stack }
+        failed.push({ error, mail })
       }
     }
+    return { delivered, failed }
   }
 
   // Based on nodemailer
