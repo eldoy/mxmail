@@ -59,7 +59,7 @@ function mxmail(config = {}) {
       const domain = getDomain(recipient)
       console.log('DOMAIN:', domain)
 
-      let { host = hostCache[domain], port = 25, auth } = config
+      let { host = hostCache[domain], port = 25, auth, name } = config
       console.log('HOST:', host)
 
       if (!host) {
@@ -67,8 +67,8 @@ function mxmail(config = {}) {
       }
 
       try {
-        console.log('CREATING TRANSPORT:', { host, port, auth })
-        const transport = nodemailer.createTransport({ host, port, auth })
+        console.log('CREATING TRANSPORT:', { host, port, auth, name })
+        const transport = nodemailer.createTransport({ host, port, auth, name })
 
         // Set up mail
         mail = { text: '', html: '', subject: '', ...mail }
