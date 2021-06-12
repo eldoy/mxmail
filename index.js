@@ -37,6 +37,8 @@ async function getHost(domain) {
 }
 
 function mxmail(config = {}) {
+  console.log('CONFIG:', config)
+
   async function mailer(mail = {}) {
     if (!mail.to) {
       throw Error('to field is missing')
@@ -55,20 +57,24 @@ function mxmail(config = {}) {
 
     for (const recipient of recipients) {
       const domain = getDomain(recipient)
+      console.log('DOMAIN:', domain)
+
       let { host = hostCache[domain], port = 25, auth } = config
-      console.log({ host })
+      console.log('HOST:', host)
 
       if (!host) {
         host = hostCache[domain] = await getHost(domain)
       }
 
       try {
+        console.log('CREATING TRANSPORT:', { host, port, auth })
         const transport = nodemailer.createTransport({ host, port, auth })
 
         // Set up mail
         mail = { text: '', html: '', subject: '', ...mail }
         mail.envelope = { from: mail.from, to: recipient }
 
+        console.log('SENDING MAIL:', mail)
         const result = await transport.sendMail(mail)
         console.log('Message sent: %s', result.messageId)
         console.log(result)
