@@ -16,10 +16,10 @@
   "author": "Vidar Eldøy <vidar@eldoy.com>",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^27.0.4"
+    "jest": "^27.3.1"
   },
   "dependencies": {
-    "nodemailer": "^6.6.1",
-    "tomarkup": "^0.5.0"
+    "nodemailer": "^6.7.0",
+    "tomarkup": "^0.8.0"
   }
 }
