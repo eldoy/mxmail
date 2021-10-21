@@ -37,8 +37,6 @@ async function getHost(domain) {
 }
 
 function mxmail(config = {}) {
-  console.log('CONFIG:', config)
-
   async function mailer(mail = {}) {
     if (!mail.to) {
       throw Error('to field is missing')
