@@ -1,12 +1,6 @@
-const os = require('os')
-const crypto = require('crypto')
 const dns = require('dns')
 const nodemailer = require('nodemailer')
-
-function getDomain(email) {
-  const m = /[^@]+@([\w\d\-\.]+)/.exec(email)
-  return m && m[1]
-}
+const mailutil = require('mailutil')
 
 function getRecords(domain) {
   return new Promise((resolve, reject) => {
@@ -20,8 +14,6 @@ function getRecords(domain) {
 
 async function getHost(domain) {
   const records = await getRecords(domain)
-
-  console.log({ records })
 
   // Return the first record that verifies
   for (const record of records) {
@@ -45,37 +37,27 @@ function mxmail(config = {}) {
       throw Error('from field is missing')
     }
 
-    console.log('Sending mail', JSON.stringify(mail, null, 2))
-
     // Recipients to send to
     const recipients = [mail.to, mail.cc, mail.bcc].join(',').split(',').filter(x => x).map(x => x.trim())
-    console.log('Found recipients', recipients)
 
     const hostCache = {}, delivered = [], failed = []
 
     for (const recipient of recipients) {
-      const domain = getDomain(recipient)
-      console.log('DOMAIN:', domain)
-
+      const domain = mailutil.domain(recipient)
       let { host = hostCache[domain], port = 25, auth, name } = config
-      console.log('HOST:', host)
-
       if (!host) {
         host = hostCache[domain] = await getHost(domain)
       }
 
       try {
-        console.log('CREATING TRANSPORT:', { host, port, auth, name })
         const transport = nodemailer.createTransport({ host, port, auth, name })
 
         // Set up mail
         mail = { text: '', html: '', subject: '', ...mail }
         mail.envelope = { from: mail.from, to: recipient }
 
-        console.log('SENDING MAIL:', mail)
         const result = await transport.sendMail(mail)
         console.log('Message sent: %s', result.messageId)
-        console.log(result)
 
         const preview = nodemailer.getTestMessageUrl(result)
         if (preview) {
@@ -92,16 +74,6 @@ function mxmail(config = {}) {
     return { delivered, failed }
   }
   return mailer
-}
-
-// Based on nodemailer, generates a mail id
-mxmail.id = function(from) {
-  const random = [2, 2, 2, 6].reduce(
-    (prev, len) => prev + '-' + crypto.randomBytes(len).toString('hex'),
-    crypto.randomBytes(4).toString('hex')
-  )
-  const domain = (getDomain(from) || os.hostname() || 'localhost').split('@').pop()
-  return `<${random}@${domain}>`
 }
 
 module.exports = mxmail

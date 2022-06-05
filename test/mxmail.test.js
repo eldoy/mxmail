@@ -64,14 +64,3 @@ it('should send email with CC and BCC', async () => {
   expect(r4.messageId).toBeDefined()
   expect(r4.envelope.to).toEqual(['quux@ethereal.email'])
 })
-
-it('should generate a message ID', async () => {
-  let id = mxmail.id()
-  expect(typeof id).toBe('string')
-
-  id = mxmail.id('vidar@test.com')
-  expect(id.endsWith('test.com>')).toBe(true)
-
-  id = mxmail.id('Vidar <vidar@test.com>')
-  expect(id.endsWith('test.com>')).toBe(true)
-})
