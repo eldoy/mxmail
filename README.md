@@ -1,6 +1,6 @@
 # Mxmail
 
-Send mail directly to mail exchange servers or SMTP. Based on [nodemailer.](https://github.com/nodemailer/nodemailer)
+Send email from the command line or your app.
 
 ### Installation
 
